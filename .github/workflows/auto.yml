@@ -1,0 +1,30 @@
+name: auto-md-generator
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"   # 每2小时运行
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: run generator
+        run: python generator.py
+
+      - name: commit changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "auto generate md" || exit 0
+          git push
